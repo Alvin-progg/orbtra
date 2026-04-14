@@ -25,7 +25,7 @@ const layer1 = [
   "https://cdn.simpleicons.org/postgresql",
 ];
 
-const avatars = [
+const layer2 = [
   "https://i.pravatar.cc/80?img=1",
   "https://i.pravatar.cc/80?img=2",
   "https://i.pravatar.cc/80?img=3",
