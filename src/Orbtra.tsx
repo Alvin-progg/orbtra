@@ -48,6 +48,7 @@ export interface OrbitProps {
   axisTilt?: number;
   axisTiltRange?: number;
   axisTiltSpeed?: number;
+  initialCircle?: boolean;
   interactiveAxis?: boolean;
   dragToRotateAxis?: boolean;
   pointerInfluence?: number;
@@ -98,6 +99,7 @@ const Orbtra = ({
   axisTilt = 22,
   axisTiltRange = 14,
   axisTiltSpeed = 0.55,
+  initialCircle = true,
   interactiveAxis = true,
   dragToRotateAxis = true,
   pointerInfluence = 8,
@@ -117,6 +119,7 @@ const Orbtra = ({
   const [pointerPosition, setPointerPosition] = useState({ x: 0, y: 0 });
   const [dragAxisOffset, setDragAxisOffset] = useState({ x: 0, y: 0 });
   const [isDraggingAxis, setIsDraggingAxis] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const frameRef = useRef<number | null>(null);
   const isPaused = useRef(false);
   const lastPointerRef = useRef<{ x: number; y: number } | null>(null);
@@ -171,6 +174,10 @@ const Orbtra = ({
       return;
     }
 
+    if (initialCircle && !hasInteracted) {
+      setHasInteracted(true);
+    }
+
     updatePointerPosition(event);
     setIsDraggingAxis(true);
     lastPointerRef.current = { x: event.clientX, y: event.clientY };
@@ -179,6 +186,10 @@ const Orbtra = ({
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     updatePointerPosition(event);
+
+    if (initialCircle && !hasInteracted) {
+      setHasInteracted(true);
+    }
 
     if (!interactiveAxis || !dragToRotateAxis || !isDraggingAxis || !lastPointerRef.current) {
       return;
@@ -343,6 +354,10 @@ const Orbtra = ({
         const orbitAxisTiltRange = layer.axisTiltRange ?? axisTiltRange;
         const orbitAxisTiltSpeed = layer.axisTiltSpeed ?? axisTiltSpeed;
 
+        const isNeutralInitialState = initialCircle && !hasInteracted;
+        const baseAxisTilt = isNeutralInitialState ? 0 : orbitAxisTilt;
+        const baseAxisTiltRange = isNeutralInitialState ? 0 : orbitAxisTiltRange;
+
         const pointerTiltX = interactiveAxis ? pointerPosition.y * safePointerInfluence : 0;
         const pointerTiltY = interactiveAxis ? pointerPosition.x * safePointerInfluence : 0;
         const dragTiltX = dragToRotateAxis ? dragAxisOffset.x : 0;
@@ -362,11 +377,11 @@ const Orbtra = ({
 
           const dynamicAxisAngle = orbitAxisRotation + angle * orbitAxisRotationSpeed;
           const dynamicAxisTilt =
-            orbitAxisTilt +
-            Math.sin(angle * orbitAxisTiltSpeed + layerIndex) * orbitAxisTiltRange +
+            baseAxisTilt +
+            Math.sin(angle * orbitAxisTiltSpeed + layerIndex) * baseAxisTiltRange +
             pointerTiltY +
             dragTiltY;
-          const dynamicAxisPitch = pointerTiltX + dragTiltX * 0.7;
+          const dynamicAxisPitch = isNeutralInitialState ? 0 : pointerTiltX + dragTiltX * 0.7;
 
           const tiltYRadians = toRadians(dynamicAxisTilt);
           const tiltXRadians = toRadians(dynamicAxisPitch);

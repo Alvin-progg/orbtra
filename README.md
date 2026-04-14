@@ -39,6 +39,7 @@ export function DemoOrbit() {
     <Orbit
       size={460}
       globalSpeed={0.012}
+      initialCircle
       pauseOnHover
       depthEffect
       ellipseRatio={1}
@@ -73,7 +74,7 @@ export function DemoOrbit() {
           depthStrength: 0.85,
           axisRotation: -20,
           axisRotationSpeed: 0.2,
-          items: avatars,
+          items: layer2,
         },
       ]}
     />
@@ -86,6 +87,8 @@ This keeps everything 2D, but simulates depth with scale, blur, opacity, and z-i
 No center sphere is rendered by default. A center appears only if you provide centerElement or centerImageSrc.
 
 Pointer movement and drag can steer the orbit axis in real time, creating a more satellite-like motion path.
+
+With initialCircle enabled, the first frame starts as a clean circle and the axis tilt kicks in after interaction.
 
 ## Item Formats
 
