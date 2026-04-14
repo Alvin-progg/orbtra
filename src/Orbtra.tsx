@@ -41,6 +41,8 @@ export interface OrbitProps {
   pauseOnHover?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  clientOnly?: boolean;
+  fallback?: React.ReactNode;
   depthEffect?: boolean;
   ellipseRatio?: number;
   axisRotation?: number;
@@ -92,6 +94,8 @@ const Orbtra = ({
   pauseOnHover = false,
   className = "",
   style,
+  clientOnly = true,
+  fallback = null,
   depthEffect = true,
   ellipseRatio = 1,
   axisRotation = 0,
@@ -99,7 +103,7 @@ const Orbtra = ({
   axisTilt = 22,
   axisTiltRange = 14,
   axisTiltSpeed = 0.55,
-  initialCircle = true,
+  initialCircle = false,
   interactiveAxis = true,
   dragToRotateAxis = true,
   pointerInfluence = 8,
@@ -115,6 +119,7 @@ const Orbtra = ({
   centerSize = 72,
   centerStyle,
 }: OrbitProps) => {
+  const [isMounted, setIsMounted] = useState(false);
   const [angle, setAngle] = useState(0);
   const [pointerPosition, setPointerPosition] = useState({ x: 0, y: 0 });
   const [dragAxisOffset, setDragAxisOffset] = useState({ x: 0, y: 0 });
@@ -130,6 +135,10 @@ const Orbtra = ({
     }
     frameRef.current = requestAnimationFrame(animate);
   };
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     frameRef.current = requestAnimationFrame(animate);
@@ -251,6 +260,14 @@ const Orbtra = ({
 
   const centerNode = renderCenter();
 
+  const containerStyle: React.CSSProperties = {
+    position: "relative",
+    width: size,
+    height: size,
+    overflow: "visible",
+    ...style,
+  };
+
   const renderOrbitItem = (item: OrbitItem, layerItemSize?: number) => {
     if (isContentItem(item)) {
       return item.content;
@@ -292,16 +309,18 @@ const Orbtra = ({
     return null;
   };
 
+  if (clientOnly && !isMounted) {
+    return (
+      <div className={className} style={containerStyle} aria-hidden>
+        {fallback}
+      </div>
+    );
+  }
+
   return (
     <div
       className={className}
-      style={{
-        position: "relative",
-        width: size,
-        height: size,
-        overflow: "visible",
-        ...style,
-      }}
+      style={containerStyle}
       onMouseEnter={() => pauseOnHover && (isPaused.current = true)}
       onMouseLeave={() => {
         if (pauseOnHover) {

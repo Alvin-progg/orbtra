@@ -7,16 +7,15 @@ Use it for tech stacks, avatars, planets, logos, or any other image/content orbi
 ## Install
 
 ```bash
-npm i orbtra
-```
-
-## Example: Circular Orbit With Moving Axis (Faux 3D)
-
-```tsx
-import React from "react";
 import { Orbit } from "orbtra";
 
-const layer1 = [
+const techstack = [
+  "https://cdn.simpleicons.org/react",
+  "https://cdn.simpleicons.org/typescript",
+  "https://cdn.simpleicons.org/node.js",
+  "https://cdn.simpleicons.org/python",
+  "https://cdn.simpleicons.org/docker",
+  "https://cdn.simpleicons.org/postgresql",
   "https://cdn.simpleicons.org/react",
   "https://cdn.simpleicons.org/typescript",
   "https://cdn.simpleicons.org/node.js",
@@ -25,21 +24,13 @@ const layer1 = [
   "https://cdn.simpleicons.org/postgresql",
 ];
 
-const layer2 = [
-  "https://i.pravatar.cc/80?img=1",
-  "https://i.pravatar.cc/80?img=2",
-  "https://i.pravatar.cc/80?img=3",
-  "https://i.pravatar.cc/80?img=4",
-  "https://i.pravatar.cc/80?img=5",
-  "https://i.pravatar.cc/80?img=6",
-];
-
-export function DemoOrbit() {
+export function App() {
   return (
-    <Orbit
+    <>
+      <div className="flex justify-center items-center h-screen">
+<Orbit
       size={460}
       globalSpeed={0.012}
-      initialCircle
       pauseOnHover
       depthEffect
       ellipseRatio={1}
@@ -58,26 +49,28 @@ export function DemoOrbit() {
       maxBlurPx={1.8}
       layers={[
         {
-          radius: 120,
+          radius: 150,
           itemSize: 38,
-          speed: 1,
+          speed: .3,
           direction: "clockwise",
           depthStrength: 1,
-          axisRotationSpeed: 0.5,
-          items: layer1,
+          axisRotationSpeed: 0.2,
+          items: techstack,
         },
         {
-          radius: 190,
+          radius: 180,
           itemSize: 42,
-          speed: 0.72,
+          speed: 0.3,
           direction: "counterclockwise",
           depthStrength: 0.85,
           axisRotation: -20,
           axisRotationSpeed: 0.2,
-          items: layer2,
+          items: techstack,
         },
       ]}
     />
+      </div>
+    </>
   );
 }
 ```
@@ -88,7 +81,15 @@ No center sphere is rendered by default. A center appears only if you provide ce
 
 Pointer movement and drag can steer the orbit axis in real time, creating a more satellite-like motion path.
 
-With initialCircle enabled, the first frame starts as a clean circle and the axis tilt kicks in after interaction.
+Distorted startup is the default. If you want a clean ring first, set initialCircle.
+
+## SSR / Hydration Note
+
+Orbtra renders in client-only mode by default to avoid hydration mismatch warnings in SSR frameworks like Next.js.
+
+- Default: `clientOnly={true}`
+- Optional placeholder before hydration: `fallback={<div style={{ width: 460, height: 460 }} />}`
+- If you want full SSR markup, set `clientOnly={false}` and ensure all props/data are deterministic on server and client.
 
 ## Item Formats
 
